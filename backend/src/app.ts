@@ -46,11 +46,15 @@ export const buildApp = async (): Promise<FastifyInstance> => {
 
   // Health check route
   app.get('/health', async () => {
+    const { checkDatabaseConnection } = await import('./utils/database');
+    const dbHealthy = await checkDatabaseConnection();
+
     return {
       success: true,
       message: 'Server is healthy',
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
+      database: dbHealthy ? 'connected' : 'disconnected',
     };
   });
 

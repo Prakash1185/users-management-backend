@@ -1,9 +1,13 @@
 import { buildApp } from './app';
 import config from './config';
 import logger from './utils/logger';
+import { connectDatabase, disconnectDatabase } from './utils/database';
 
 const start = async (): Promise<void> => {
   try {
+    // Connect to database
+    await connectDatabase();
+
     const app = await buildApp();
 
     await app.listen({
@@ -19,6 +23,7 @@ const start = async (): Promise<void> => {
     const shutdown = async (signal: string): Promise<void> => {
       logger.info(`${signal} received, shutting down gracefully...`);
       await app.close();
+      await disconnectDatabase();
       logger.info('Server closed');
       process.exit(0);
     };
