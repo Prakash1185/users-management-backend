@@ -6,7 +6,7 @@ export const connectDatabase = async (): Promise<void> => {
     await prisma.$connect();
     logger.info('Database connected successfully');
   } catch (error) {
-    logger.error('Failed to connect to database:', error);
+    logger.error({ err: error }, 'Failed to connect to database');
     throw error;
   }
 };
@@ -16,7 +16,7 @@ export const disconnectDatabase = async (): Promise<void> => {
     await prisma.$disconnect();
     logger.info('Database disconnected successfully');
   } catch (error) {
-    logger.error('Failed to disconnect from database:', error);
+    logger.error({ err: error }, 'Failed to disconnect from database');
     throw error;
   }
 };
@@ -26,7 +26,7 @@ export const checkDatabaseConnection = async (): Promise<boolean> => {
     await prisma.$queryRaw`SELECT 1`;
     return true;
   } catch (error) {
-    logger.error('Database health check failed:', error);
+    logger.error({ err: error }, 'Database health check failed');
     return false;
   }
 };

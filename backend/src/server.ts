@@ -32,7 +32,7 @@ const start = async (): Promise<void> => {
     process.on('SIGINT', () => void shutdown('SIGINT'));
   } catch (err) {
     console.error('Error starting server:', err);
-    logger.error('Error starting server:', err);
+    logger.error({ err }, 'Error starting server');
     process.exit(1);
   }
 };
