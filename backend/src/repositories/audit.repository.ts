@@ -20,7 +20,7 @@ export class AuditRepository {
     ipAddress?: string;
     userAgent?: string;
   }) {
-    return prisma.auditLog.create({ data: { ...data, details: data.details ?? {} } });
+    return prisma.auditLog.create({ data: { ...data, details: data.details ? JSON.parse(JSON.stringify(data.details)) : undefined } });
   }
 
   async findMany(filters: AuditLogFilters) {
@@ -31,15 +31,15 @@ export class AuditRepository {
     if (action) where.action = { contains: action, mode: 'insensitive' };
     if (resource) where.resource = resource;
     if (startDate || endDate) {
-      where.createdAt = {};
-      if (startDate) (where.createdAt as Record<string, Date>).gte = startDate;
-      if (endDate) (where.createdAt as Record<string, Date>).lte = endDate;
+      where.timestamp = {};
+      if (startDate) (where.timestamp as Record<string, Date>).gte = startDate;
+      if (endDate) (where.timestamp as Record<string, Date>).lte = endDate;
     }
 
     const [logs, total] = await Promise.all([
       prisma.auditLog.findMany({
         where,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { timestamp: 'desc' },
         skip: (page - 1) * limit,
         take: limit,
         include: { user: { select: { id: true, email: true, username: true } } },
@@ -54,9 +54,9 @@ export class AuditRepository {
     const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
     
     const [totalLogs, byAction, byResource] = await Promise.all([
-      prisma.auditLog.count({ where: { createdAt: { gte: since } } }),
-      prisma.auditLog.groupBy({ by: ['action'], _count: true, where: { createdAt: { gte: since } }, orderBy: { _count: { action: 'desc' } }, take: 10 }),
-      prisma.auditLog.groupBy({ by: ['resource'], _count: true, where: { createdAt: { gte: since } }, orderBy: { _count: { resource: 'desc' } }, take: 10 }),
+      prisma.auditLog.count({ where: { timestamp: { gte: since } } }),
+      prisma.auditLog.groupBy({ by: ['action'], _count: true, where: { timestamp: { gte: since } }, orderBy: { _count: { action: 'desc' } }, take: 10 }),
+      prisma.auditLog.groupBy({ by: ['resource'], _count: true, where: { timestamp: { gte: since } }, orderBy: { _count: { resource: 'desc' } }, take: 10 }),
     ]);
 
     return { totalLogs, byAction: byAction.map(a => ({ action: a.action, count: a._count })), byResource: byResource.map(r => ({ resource: r.resource, count: r._count })), period: `${days} days` };
@@ -64,7 +64,7 @@ export class AuditRepository {
 
   async deleteOldLogs(retentionDays: number) {
     const cutoff = new Date(Date.now() - retentionDays * 24 * 60 * 60 * 1000);
-    return prisma.auditLog.deleteMany({ where: { createdAt: { lt: cutoff } } });
+    return prisma.auditLog.deleteMany({ where: { timestamp: { lt: cutoff } } });
   }
 }
 

@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { FastifyInstance, FastifyRequest } from 'fastify';
 import auditController from '../controllers/audit.controller';
 import { authenticate } from '../middlewares/auth';
 import { requirePermission, requireAdmin } from '../middlewares/rbac';
