@@ -65,7 +65,7 @@ export default function Home() {
 
       <div className="mx-auto px-6 py-12 mt-10  max-w-7xl ">
         <div className="space-y-2">
-          <Badge className="rounded-sm bg-white text-black hover:bg-neutral-200">
+          <Badge className="rounded-sm  text-black  bg-neutral-200">
             Production Ready
           </Badge>
           <h1 className="text-4xl font-bold tracking-tight text-foreground">
