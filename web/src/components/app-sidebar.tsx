@@ -131,7 +131,7 @@ export function AppSidebar() {
       <Separator className="bg-border" />
       <SidebarFooter className="p-4">
         <div className="flex items-center justify-between">
-          <p className="text-xs text-muted-foreground">v1.0.0 • MIT</p>
+          <p className="text-xs text-muted-foreground">v1.0.0</p>
           <div className="flex items-center gap-1">
             <Tooltip>
               <TooltipTrigger asChild>
