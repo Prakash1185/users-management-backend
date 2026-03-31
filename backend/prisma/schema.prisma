@@ -169,6 +169,7 @@ model TwoFactorAuth {
   backupCodes  String[] // Array of backup codes
   isEnabled    Boolean  @default(false)
   enabledAt    DateTime?
+  lastUsedAt   DateTime?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -181,9 +182,11 @@ model TwoFactorAuth {
 model Session {
   id           String   @id @default(cuid())
   userId       String
+  token        String   @unique
   deviceInfo   String?
   ipAddress    String?
   userAgent    String?
+  isValid      Boolean  @default(true)
   lastActivity DateTime @default(now())
   expiresAt    DateTime
   createdAt    DateTime @default(now())
@@ -191,6 +194,7 @@ model Session {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([token])
   @@index([expiresAt])
   @@map("sessions")
 }
