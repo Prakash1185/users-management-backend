@@ -35,7 +35,7 @@ export const buildApp = async (): Promise<FastifyInstance> => {
   });
 
   await app.register(cors, {
-    origin: config.nodeEnv === 'development' ? true : ['http://localhost:3001'],
+    origin: config.nodeEnv === 'development' ? true : ['http://localhost:5001'],
     credentials: true,
   });
 
@@ -65,8 +65,41 @@ export const buildApp = async (): Promise<FastifyInstance> => {
       message: 'User Management API v1',
       version: '1.0.0',
       documentation: '/api/v1/docs',
+      endpoints: {
+        health: 'GET /health',
+        api: 'GET /api/v1',
+        auth: {
+          register: 'POST /api/v1/auth/register',
+          checkEmail: 'GET /api/v1/auth/check-email',
+          checkUsername: 'GET /api/v1/auth/check-username',
+        },
+        examples: {
+          register: 'POST /api/v1/example/register',
+          login: 'POST /api/v1/example/login',
+          user: 'GET /api/v1/example/user/:id',
+          users: 'GET /api/v1/example/users',
+        },
+      },
     };
   });
+
+  // Register example routes
+  await app.register(
+    async (instance) => {
+      const exampleRoutes = await import('./routes/example.routes');
+      await exampleRoutes.default(instance);
+    },
+    { prefix: '/api/v1' }
+  );
+
+  // Register auth routes
+  await app.register(
+    async (instance) => {
+      const authRoutes = await import('./routes/auth.routes');
+      await authRoutes.default(instance);
+    },
+    { prefix: '/api/v1/auth' }
+  );
 
   // Not found handler
   app.setNotFoundHandler(notFoundHandler);
