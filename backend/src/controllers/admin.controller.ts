@@ -128,12 +128,20 @@ export class AdminController {
 
   // Impersonate user (generate token as user)
   async impersonateUser(request: FastifyRequest<{ Params: { userId: string } }>, reply: FastifyReply): Promise<void> {
-    const user = await prisma.user.findUnique({ where: { id: request.params.userId }, include: { roles: { include: { role: true } } } });
+    const user = await prisma.user.findUnique({ 
+      where: { id: request.params.userId }, 
+      include: { userRoles: { include: { role: true } } } 
+    });
     if (!user) throw new NotFoundError('User not found');
 
     const jwtService = (await import('../services/jwt.service')).default;
-    const permissions = user.roles.flatMap(ur => ur.role.permissions as string[]);
-    const accessToken = jwtService.generateAccessToken({ userId: user.id, email: user.email, roles: user.roles.map(ur => ur.role.name), permissions, impersonatedBy: request.user!.id });
+    const userWithRoles = user as typeof user & { userRoles: Array<{ role: { name: string; permissions: unknown } }> };
+    const accessToken = jwtService.generateAccessToken({ 
+      userId: user.id, 
+      email: user.email, 
+      username: user.username,
+      roles: userWithRoles.userRoles.map((ur) => ur.role.name) 
+    });
 
     await prisma.auditLog.create({ data: { userId: request.user!.id, action: 'ADMIN_IMPERSONATE', resource: 'user', resourceId: user.id } });
 

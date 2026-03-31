@@ -30,3 +30,5 @@ export const checkDatabaseConnection = async (): Promise<boolean> => {
     return false;
   }
 };
+
+export default prisma;
