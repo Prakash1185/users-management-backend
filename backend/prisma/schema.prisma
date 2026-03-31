@@ -1,0 +1,235 @@
+// Prisma Schema for User Management Backend
+// Database: PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Core User Model
+model User {
+  id                String    @id @default(cuid())
+  email             String    @unique
+  username          String    @unique
+  password          String
+  firstName         String?
+  lastName          String?
+  avatar            String?
+  emailVerified     Boolean   @default(false)
+  isActive          Boolean   @default(true)
+  isSuspended       Boolean   @default(false)
+  lastLoginAt       DateTime?
+  failedLoginAttempts Int     @default(0)
+  lockedUntil       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  deletedAt         DateTime?
+
+  // Relations
+  profile           UserProfile?
+  refreshTokens     RefreshToken[]
+  emailVerifications EmailVerification[]
+  passwordResets    PasswordReset[]
+  passwordHistories PasswordHistory[]
+  userRoles         UserRole[]
+  twoFactorAuth     TwoFactorAuth?
+  sessions          Session[]
+  auditLogs         AuditLog[]
+  notifications     Notification[]
+
+  @@index([email])
+  @@index([username])
+  @@index([emailVerified])
+  @@index([isActive])
+  @@map("users")
+}
+
+// User Profile - Extended user information
+model UserProfile {
+  id          String    @id @default(cuid())
+  userId      String    @unique
+  bio         String?
+  phone       String?
+  dateOfBirth DateTime?
+  address     String?
+  city        String?
+  country     String?
+  timezone    String?
+  language    String    @default("en")
+  preferences Json?     // Store user preferences as JSON
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+// JWT Refresh Tokens
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@map("refresh_tokens")
+}
+
+// Email Verification Tokens
+model EmailVerification {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@map("email_verifications")
+}
+
+// Password Reset Tokens
+model PasswordReset {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@map("password_resets")
+}
+
+// Password History - Prevent password reuse
+model PasswordHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  password  String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("password_histories")
+}
+
+// Roles
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  permissions Json     // Store permissions as JSON array
+  isSystem    Boolean  @default(false) // System roles cannot be deleted
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userRoles UserRole[]
+
+  @@index([name])
+  @@map("roles")
+}
+
+// User-Role Junction Table
+model UserRole {
+  id         String   @id @default(cuid())
+  userId     String
+  roleId     String
+  assignedAt DateTime @default(now())
+  assignedBy String?  // ID of admin who assigned the role
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+  @@index([userId])
+  @@index([roleId])
+  @@map("user_roles")
+}
+
+// Two-Factor Authentication
+model TwoFactorAuth {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  secret       String
+  backupCodes  String[] // Array of backup codes
+  isEnabled    Boolean  @default(false)
+  enabledAt    DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("two_factor_auth")
+}
+
+// Active Sessions
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  deviceInfo   String?
+  ipAddress    String?
+  userAgent    String?
+  lastActivity DateTime @default(now())
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+// Audit Logs
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  action     String   // e.g., "USER_LOGIN", "USER_CREATED", "PASSWORD_CHANGED"
+  resource   String?  // e.g., "user", "role"
+  resourceId String?
+  details    Json?    // Additional details as JSON
+  ipAddress  String?
+  userAgent  String?
+  timestamp  DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([action])
+  @@index([timestamp])
+  @@map("audit_logs")
+}
+
+// Notifications
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // e.g., "EMAIL", "SECURITY_ALERT"
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  metadata  Json?    // Additional data as JSON
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
+  @@map("notifications")
+}
