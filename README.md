@@ -2,6 +2,10 @@
 
 A production-grade REST API for comprehensive user management built with TypeScript, Fastify, Prisma, and PostgreSQL.
 
+<p align="center">
+  <img src="/web/public/hero.png" alt="User Management Backend Banner" width="100%" />
+</p>
+
 ## Features
 
 - **Authentication**: JWT-based with access/refresh tokens, email verification, password reset
