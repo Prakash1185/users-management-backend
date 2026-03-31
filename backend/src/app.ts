@@ -203,6 +203,14 @@ export const buildApp = async (): Promise<FastifyInstance> => {
     { prefix: '/api/v1/notifications' }
   );
 
+  // Register health routes (no prefix - at root level)
+  await app.register(
+    async (instance) => {
+      const healthRoutes = await import('./routes/health.routes');
+      await healthRoutes.default(instance);
+    }
+  );
+
   // Not found handler
   app.setNotFoundHandler(notFoundHandler);
 

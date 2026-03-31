@@ -19,7 +19,7 @@ export class NotificationService {
         type: notification.type,
         title: notification.title,
         message: notification.message,
-        metadata: notification.data ?? {},
+        metadata: notification.data ? JSON.parse(JSON.stringify(notification.data)) : undefined,
       },
     });
     logger.debug({ notificationId: created.id, message: 'Notification created' });

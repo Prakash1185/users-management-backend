@@ -46,9 +46,9 @@ export class AuditService {
 
     const [totalUsers, activeToday, activeWeek, activeMonth, newUsersToday, newUsersWeek, loginStats, verifiedUsers] = await Promise.all([
       prisma.user.count(),
-      prisma.auditLog.groupBy({ by: ['userId'], where: { createdAt: { gte: today }, action: 'USER_LOGIN' } }).then(r => r.length),
-      prisma.auditLog.groupBy({ by: ['userId'], where: { createdAt: { gte: weekAgo }, action: 'USER_LOGIN' } }).then(r => r.length),
-      prisma.auditLog.groupBy({ by: ['userId'], where: { createdAt: { gte: monthAgo }, action: 'USER_LOGIN' } }).then(r => r.length),
+      prisma.auditLog.groupBy({ by: ['userId'], where: { createdAt: { gte: today }, action: 'USER_LOGIN' } }).then((results: unknown[]) => results.length),
+      prisma.auditLog.groupBy({ by: ['userId'], where: { createdAt: { gte: weekAgo }, action: 'USER_LOGIN' } }).then((results: unknown[]) => results.length),
+      prisma.auditLog.groupBy({ by: ['userId'], where: { createdAt: { gte: monthAgo }, action: 'USER_LOGIN' } }).then((results: unknown[]) => results.length),
       prisma.user.count({ where: { createdAt: { gte: today } } }),
       prisma.user.count({ where: { createdAt: { gte: weekAgo } } }),
       prisma.auditLog.count({ where: { action: 'USER_LOGIN', createdAt: { gte: monthAgo } } }),
