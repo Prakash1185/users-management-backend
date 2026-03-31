@@ -10,7 +10,7 @@ export default function GettingStartedPage() {
     <div className="min-h-screen bg-background">
       <PageHeader title="Getting Started" />
 
-      <div className="mx-auto max-w-4xl px-6 py-12">
+      <div className="mx-auto mt-10  max-w-7xl  px-6 py-12">
         <div className="space-y-2">
           <h1 className="text-3xl font-bold tracking-tight text-foreground">Getting Started</h1>
           <p className="text-muted-foreground">
@@ -58,7 +58,7 @@ cd backend && npm install`}
               <h2 className="text-lg font-semibold text-foreground">Configuration</h2>
             </div>
             <Card className="rounded-sm border-border bg-card ml-9">
-              <CardContent className="p-4">
+              <CardContent className="">
                 <pre className="font-mono text-xs text-muted-foreground overflow-x-auto">
 {`# Copy environment template
 cp .env.example .env

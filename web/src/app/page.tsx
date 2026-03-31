@@ -63,7 +63,7 @@ export default function Home() {
     <div className="min-h-screen bg-background">
       <PageHeader title="User Management API" />
 
-      <div className="mx-auto max-w-7xl px-6 py-12 mt-10">
+      <div className="mx-auto px-6 py-12 mt-10  max-w-7xl ">
         <div className="space-y-2">
           <Badge className="rounded-sm bg-white text-black hover:bg-neutral-200">
             Production Ready
@@ -115,7 +115,7 @@ npm run db:migrate && npm run dev`}</code>
                 key={f.title}
                 className="rounded-sm border-border bg-card hover:border-border transition-colors"
               >
-                <CardHeader className="p-4 pb-2">
+                <CardHeader className=" pb-2">
                   <div className="flex items-center gap-3">
                     <div className="flex h-8 w-8 items-center justify-center rounded-sm bg-border">
                       <f.icon className="h-4 w-4 text-foreground" />

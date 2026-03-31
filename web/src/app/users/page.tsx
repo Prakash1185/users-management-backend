@@ -23,7 +23,7 @@ export default function UsersPage() {
     <div className="min-h-screen bg-background">
       <PageHeader title="User Profile" />
 
-      <div className="mx-auto max-w-4xl px-6 py-12">
+      <div className="mx-auto mt-10  max-w-7xl  px-6 py-12">
         <div className="space-y-2">
           <h1 className="text-3xl font-bold tracking-tight text-foreground">User Profile</h1>
           <p className="text-muted-foreground">
