@@ -1,92 +1,186 @@
-import Link from "next/link";
+"use client";
+
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { PageHeader } from "@/components/page-header";
+import {
+  Key,
+  Shield,
+  Smartphone,
+  Users,
+  Activity,
+  Bell,
+  FileText,
+  Heart,
+} from "lucide-react";
 
 const features = [
-  { title: "JWT Authentication", desc: "Secure access/refresh token system with 15-min access tokens", icon: "🔐" },
-  { title: "Two-Factor Auth", desc: "TOTP-based 2FA with QR codes and backup codes", icon: "📱" },
-  { title: "Role-Based Access", desc: "Granular RBAC with 14 permissions and hierarchical roles", icon: "👥" },
-  { title: "Session Management", desc: "Track and revoke sessions across devices", icon: "💻" },
-  { title: "Audit Logging", desc: "Comprehensive activity tracking and analytics", icon: "📊" },
-  { title: "Admin Dashboard", desc: "Full user management with impersonation support", icon: "⚙️" },
-  { title: "Account Security", desc: "Lockout protection, password history, email verification", icon: "🛡️" },
-  { title: "GDPR Compliant", desc: "Data export, soft delete with 30-day recovery", icon: "📋" },
+  {
+    title: "JWT Authentication",
+    desc: "Access/refresh tokens with 15-min expiry",
+    icon: Key,
+  },
+  {
+    title: "Two-Factor Auth",
+    desc: "TOTP with QR codes & backup codes",
+    icon: Smartphone,
+  },
+  { title: "Role-Based Access", desc: "14 granular permissions", icon: Shield },
+  {
+    title: "Session Management",
+    desc: "Track & revoke across devices",
+    icon: Activity,
+  },
+  { title: "Admin Dashboard", desc: "User search, impersonation", icon: Users },
+  {
+    title: "Audit Logging",
+    desc: "Complete activity tracking",
+    icon: FileText,
+  },
+  { title: "Notifications", desc: "In-app notification system", icon: Bell },
+  { title: "Health Checks", desc: "K8s ready endpoints", icon: Heart },
 ];
 
 const techStack = [
-  { name: "Fastify", desc: "High-performance Node.js framework" },
-  { name: "TypeScript", desc: "Type-safe development" },
-  { name: "Prisma", desc: "Modern database ORM" },
-  { name: "PostgreSQL", desc: "Reliable relational database" },
-  { name: "JWT", desc: "Stateless authentication" },
-  { name: "Zod", desc: "Schema validation" },
+  "Fastify",
+  "TypeScript",
+  "Prisma",
+  "PostgreSQL",
+  "JWT",
+  "Zod",
+  "bcrypt",
 ];
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-      {/* Hero */}
-      <header className="container mx-auto px-6 py-16 text-center">
-        <h1 className="text-5xl font-bold text-white mb-4">
-          User Management <span className="text-blue-400">Backend</span>
-        </h1>
-        <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-          Production-grade REST API for comprehensive user management with authentication, RBAC, 2FA, and enterprise security features.
-        </p>
-        <div className="flex gap-4 justify-center">
-          <Link href="/api" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition">
-            View API Docs
-          </Link>
-          <Link href="/features" className="border border-gray-500 hover:border-gray-300 text-gray-300 px-8 py-3 rounded-lg font-semibold transition">
-            Explore Features
-          </Link>
-        </div>
-      </header>
+    <div className="min-h-screen bg-background">
+      <PageHeader title="User Management API" />
 
-      {/* Features Grid */}
-      <section className="container mx-auto px-6 py-16">
-        <h2 className="text-3xl font-bold text-white text-center mb-12">Core Features</h2>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {features.map((f) => (
-            <div key={f.title} className="bg-gray-800/50 border border-gray-700 rounded-xl p-6 hover:border-blue-500/50 transition">
-              <span className="text-4xl mb-4 block">{f.icon}</span>
-              <h3 className="text-lg font-semibold text-white mb-2">{f.title}</h3>
-              <p className="text-gray-400 text-sm">{f.desc}</p>
-            </div>
-          ))}
+      <div className="mx-auto max-w-7xl px-6 py-12 mt-10">
+        <div className="space-y-2">
+          <Badge className="rounded-sm bg-white text-black hover:bg-neutral-200">
+            Production Ready
+          </Badge>
+          <h1 className="text-4xl font-bold tracking-tight text-foreground">
+            User Management API
+          </h1>
+          <p className="text-lg text-muted-foreground max-w-2xl">
+            A production-grade REST API for comprehensive user management with
+            authentication, RBAC, 2FA, and enterprise security features.
+          </p>
         </div>
-      </section>
 
-      {/* Tech Stack */}
-      <section className="container mx-auto px-6 py-16">
-        <h2 className="text-3xl font-bold text-white text-center mb-12">Tech Stack</h2>
-        <div className="flex flex-wrap justify-center gap-4">
-          {techStack.map((t) => (
-            <div key={t.name} className="bg-gray-800 border border-gray-700 rounded-lg px-6 py-3 text-center">
-              <div className="text-white font-semibold">{t.name}</div>
-              <div className="text-gray-400 text-sm">{t.desc}</div>
-            </div>
-          ))}
-        </div>
-      </section>
+        <Separator className="my-8 bg-border" />
 
-      {/* Quick Start */}
-      <section className="container mx-auto px-6 py-16">
-        <div className="bg-gray-800/50 border border-gray-700 rounded-2xl p-8 max-w-3xl mx-auto">
-          <h2 className="text-2xl font-bold text-white mb-6">Quick Start</h2>
-          <div className="bg-gray-900 rounded-lg p-4 font-mono text-sm text-gray-300 overflow-x-auto">
-            <div className="text-gray-500"># Clone and setup</div>
-            <div>cd backend && npm install</div>
-            <div className="mt-2 text-gray-500"># Configure environment</div>
-            <div>cp .env.example .env</div>
-            <div className="mt-2 text-gray-500"># Run migrations and start</div>
-            <div>npm run db:migrate && npm run dev</div>
+        <section className="space-y-4">
+          <h2 className="text-xl font-semibold text-foreground">Quick Start</h2>
+          <Card className="rounded-sm border-border bg-card">
+            <CardContent className="p-4">
+              <pre className="font-mono text-sm text-muted-foreground overflow-x-auto">
+                <code>{`# Clone and setup
+cd backend && npm install
+
+# Configure environment
+cp .env.example .env
+
+# Run migrations and start
+npm run db:migrate && npm run dev`}</code>
+              </pre>
+            </CardContent>
+          </Card>
+          <p className="text-sm text-muted-foreground">
+            Base URL:{" "}
+            <code className="font-mono bg-border px-2 py-0.5 rounded-sm text-foreground">
+              http://localhost:5001/api/v1
+            </code>
+          </p>
+        </section>
+
+        <Separator className="my-8 bg-border" />
+
+        <section className="space-y-4">
+          <h2 className="text-xl font-semibold text-foreground">
+            Core Features
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {features.map((f) => (
+              <Card
+                key={f.title}
+                className="rounded-sm border-border bg-card hover:border-border transition-colors"
+              >
+                <CardHeader className="p-4 pb-2">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-sm bg-border">
+                      <f.icon className="h-4 w-4 text-foreground" />
+                    </div>
+                    <CardTitle className="text-sm font-medium text-foreground">
+                      {f.title}
+                    </CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="px-4   pt-0">
+                  <CardDescription className="text-muted-foreground text-sm">
+                    {f.desc}
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-800 py-8 text-center text-gray-400">
-        <p>Built as a learning project • Production-grade architecture</p>
-      </footer>
+        <Separator className="my-8 bg-border" />
+
+        <section className="space-y-4">
+          <h2 className="text-xl font-semibold text-foreground">Tech Stack</h2>
+          <div className="flex flex-wrap gap-2">
+            {techStack.map((tech) => (
+              <Badge
+                key={tech}
+                variant="outline"
+                className="rounded-sm border-border text-muted-foreground"
+              >
+                {tech}
+              </Badge>
+            ))}
+          </div>
+        </section>
+
+        <Separator className="my-8 bg-border" />
+
+        <section className="space-y-4">
+          <h2 className="text-xl font-semibold text-foreground">
+            API Endpoints
+          </h2>
+          <div className="space-y-2 text-sm">
+            {[
+              { path: "/api/v1/auth/*", desc: "Authentication" },
+              { path: "/api/v1/users/*", desc: "User Profile" },
+              { path: "/api/v1/2fa/*", desc: "Two-Factor Auth" },
+              { path: "/api/v1/sessions/*", desc: "Sessions" },
+              { path: "/api/v1/admin/*", desc: "Admin Panel" },
+              { path: "/api/v1/roles/*", desc: "RBAC" },
+              { path: "/api/v1/audit/*", desc: "Audit Logs" },
+            ].map((e) => (
+              <div
+                key={e.path}
+                className="flex items-center gap-4 p-3 rounded-sm bg-card border border-border"
+              >
+                <code className="font-mono text-foreground flex-1">
+                  {e.path}
+                </code>
+                <span className="text-muted-foreground">{e.desc}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
     </div>
   );
 }
