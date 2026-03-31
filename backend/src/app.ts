@@ -167,6 +167,24 @@ export const buildApp = async (): Promise<FastifyInstance> => {
     { prefix: '/api/v1/sessions' }
   );
 
+  // Register role routes
+  await app.register(
+    async (instance) => {
+      const roleRoutes = await import('./routes/role.routes');
+      await roleRoutes.default(instance);
+    },
+    { prefix: '/api/v1/roles' }
+  );
+
+  // Register audit routes
+  await app.register(
+    async (instance) => {
+      const auditRoutes = await import('./routes/audit.routes');
+      await auditRoutes.default(instance);
+    },
+    { prefix: '/api/v1/audit' }
+  );
+
   // Not found handler
   app.setNotFoundHandler(notFoundHandler);
 
