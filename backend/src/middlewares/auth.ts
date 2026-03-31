@@ -4,7 +4,7 @@ import { UnauthorizedError } from '../utils/errors';
 
 export const authenticate = async (
   request: FastifyRequest,
-  reply: FastifyReply
+  _reply: FastifyReply
 ): Promise<void> => {
   try {
     const authHeader = request.headers.authorization;
@@ -46,7 +46,7 @@ export const authenticate = async (
 
 export const optionalAuth = async (
   request: FastifyRequest,
-  reply: FastifyReply
+  _reply: FastifyReply
 ): Promise<void> => {
   try {
     const authHeader = request.headers.authorization;
@@ -67,7 +67,7 @@ export const optionalAuth = async (
         };
       }
     }
-  } catch (error) {
+  } catch {
     // Ignore errors for optional auth
   }
 };

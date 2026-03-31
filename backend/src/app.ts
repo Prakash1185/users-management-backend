@@ -2,6 +2,9 @@ import Fastify, { FastifyInstance } from 'fastify';
 import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
 import rateLimit from '@fastify/rate-limit';
+import multipart from '@fastify/multipart';
+import fastifyStatic from '@fastify/static';
+import path from 'path';
 import config from './config';
 import { errorHandler } from './middlewares/errorHandler';
 import { notFoundHandler } from './middlewares/notFoundHandler';
@@ -42,6 +45,21 @@ export const buildApp = async (): Promise<FastifyInstance> => {
   await app.register(rateLimit, {
     max: config.rateLimit.max,
     timeWindow: config.rateLimit.window,
+  });
+
+  // File upload support
+  await app.register(multipart, {
+    limits: {
+      fileSize: 5 * 1024 * 1024, // 5MB max
+      files: 1, // Single file per request
+    },
+  });
+
+  // Serve static files (uploads)
+  await app.register(fastifyStatic, {
+    root: path.join(process.cwd(), 'uploads'),
+    prefix: '/uploads/',
+    decorateReply: false,
   });
 
   // Health check route
@@ -102,6 +120,33 @@ export const buildApp = async (): Promise<FastifyInstance> => {
       await authRoutes.default(instance);
     },
     { prefix: '/api/v1/auth' }
+  );
+
+  // Register user routes
+  await app.register(
+    async (instance) => {
+      const userRoutes = await import('./routes/user.routes');
+      await userRoutes.default(instance);
+    },
+    { prefix: '/api/v1/users' }
+  );
+
+  // Register account routes
+  await app.register(
+    async (instance) => {
+      const accountRoutes = await import('./routes/account.routes');
+      await accountRoutes.default(instance);
+    },
+    { prefix: '/api/v1/account' }
+  );
+
+  // Register upload routes
+  await app.register(
+    async (instance) => {
+      const uploadRoutes = await import('./routes/upload.routes');
+      await uploadRoutes.default(instance);
+    },
+    { prefix: '/api/v1/upload' }
   );
 
   // Not found handler

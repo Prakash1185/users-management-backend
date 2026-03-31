@@ -1,8 +1,9 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import authService from '../services/auth.service';
+import passwordService from '../services/password.service';
 import { successResponse } from '../utils/response';
 import { z } from 'zod';
-import { registerSchema, loginSchema } from '../validators/schemas';
+import { registerSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema, changePasswordSchema } from '../validators/schemas';
 import logger from '../utils/logger';
 
 export class AuthController {
@@ -149,6 +150,99 @@ export class AuthController {
           available: isAvailable,
         }
       )
+    );
+  }
+
+  async verifyEmail(
+    request: FastifyRequest<{ Querystring: { token: string } }>,
+    reply: FastifyReply
+  ): Promise<void> {
+    const { token } = request.query;
+
+    if (!token) {
+      reply.status(400).send({
+        success: false,
+        message: 'Verification token is required',
+        statusCode: 400,
+      });
+      return;
+    }
+
+    await authService.verifyEmail(token);
+
+    reply.send(
+      successResponse('Email verified successfully. You can now login to your account.')
+    );
+  }
+
+  async resendVerificationEmail(
+    request: FastifyRequest<{ Body: { email: string } }>,
+    reply: FastifyReply
+  ): Promise<void> {
+    const { email } = request.body;
+
+    if (!email) {
+      reply.status(400).send({
+        success: false,
+        message: 'Email is required',
+        statusCode: 400,
+      });
+      return;
+    }
+
+    await authService.resendVerificationEmail(email);
+
+    reply.send(
+      successResponse('Verification email sent. Please check your inbox.')
+    );
+  }
+
+  async forgotPassword(
+    request: FastifyRequest<{ Body: z.infer<typeof forgotPasswordSchema> }>,
+    reply: FastifyReply
+  ): Promise<void> {
+    const { email } = request.body;
+
+    await passwordService.forgotPassword(email);
+
+    // Always return success to prevent email enumeration
+    reply.send(
+      successResponse('If an account with that email exists, a password reset link has been sent.')
+    );
+  }
+
+  async resetPassword(
+    request: FastifyRequest<{ Body: z.infer<typeof resetPasswordSchema> }>,
+    reply: FastifyReply
+  ): Promise<void> {
+    const { token, password } = request.body;
+
+    await passwordService.resetPassword(token, password);
+
+    reply.send(
+      successResponse('Password has been reset successfully. You can now login with your new password.')
+    );
+  }
+
+  async changePassword(
+    request: FastifyRequest<{ Body: z.infer<typeof changePasswordSchema> }>,
+    reply: FastifyReply
+  ): Promise<void> {
+    if (!request.user) {
+      reply.status(401).send({
+        success: false,
+        message: 'Authentication required',
+        statusCode: 401,
+      });
+      return;
+    }
+
+    const { currentPassword, newPassword } = request.body;
+
+    await passwordService.changePassword(request.user.id, currentPassword, newPassword);
+
+    reply.send(
+      successResponse('Password changed successfully. Please login again with your new password.')
     );
   }
 }

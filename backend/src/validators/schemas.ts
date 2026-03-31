@@ -25,8 +25,8 @@ export const phoneSchema = z
 export const dateSchema = z.string().datetime().or(z.date()).optional();
 
 export const paginationSchema = z.object({
-  page: z.string().transform(Number).pipe(z.number().int().positive()).default('1'),
-  limit: z.string().transform(Number).pipe(z.number().int().positive().max(100)).default('10'),
+  page: z.coerce.number().int().positive().default(1),
+  limit: z.coerce.number().int().positive().max(100).default(10),
 });
 
 export const idSchema = z.object({

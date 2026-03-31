@@ -1,5 +1,11 @@
 import prisma from '../config/database';
-import { User, Prisma } from '@prisma/client';
+import { User, Prisma, UserProfile, UserRole, Role } from '@prisma/client';
+
+// Type for user with relations
+type UserWithRelations = User & {
+  profile: UserProfile | null;
+  userRoles: (UserRole & { role: Role })[];
+};
 
 export class UserRepository {
   async create(data: Prisma.UserCreateInput): Promise<User> {
@@ -11,7 +17,7 @@ export class UserRepository {
     });
   }
 
-  async findById(id: string): Promise<User | null> {
+  async findById(id: string): Promise<UserWithRelations | null> {
     return await prisma.user.findUnique({
       where: { id },
       include: {

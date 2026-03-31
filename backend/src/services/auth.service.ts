@@ -1,10 +1,11 @@
-import { User } from '@prisma/client';
 import userRepository from '../repositories/user.repository';
 import tokenRepository from '../repositories/token.repository';
+import emailVerificationRepository from '../repositories/emailVerification.repository';
 import hashService from './hash.service';
 import jwtService from './jwt.service';
+import emailService from './email.service';
 import prisma from '../config/database';
-import { ConflictError, BadRequestError, UnauthorizedError } from '../utils/errors';
+import { ConflictError, BadRequestError, UnauthorizedError, NotFoundError } from '../utils/errors';
 import logger from '../utils/logger';
 
 export interface RegisterInput {
@@ -120,26 +121,16 @@ export class AuthService {
     const verificationToken = hashService.generateToken(64);
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
-    await prisma.emailVerification.create({
-      data: {
-        userId: user.id,
-        token: verificationToken,
-        expiresAt,
-      },
-    });
+    await emailVerificationRepository.create(user.id, verificationToken, expiresAt);
+
+    // Send verification email
+    await emailService.sendVerificationEmail(user.email, verificationToken, user.username);
 
     logger.info({
       userId: user.id,
       email: user.email,
       username: user.username,
-      message: 'User registered successfully',
-    });
-
-    // TODO: Send verification email (Phase 2: Email Verification)
-    logger.info({
-      userId: user.id,
-      verificationToken,
-      message: 'Email verification token generated',
+      message: 'User registered successfully and verification email sent',
     });
 
     return {
@@ -326,6 +317,70 @@ export class AuthService {
   async checkUsernameAvailability(username: string): Promise<boolean> {
     const user = await userRepository.findByUsername(username.toLowerCase().trim());
     return !user;
+  }
+
+  async verifyEmail(token: string): Promise<void> {
+    const verification = await emailVerificationRepository.findByToken(token);
+
+    if (!verification) {
+      throw new BadRequestError('Invalid or expired verification token');
+    }
+
+    if (verification.expiresAt < new Date()) {
+      await emailVerificationRepository.deleteByToken(token);
+      throw new BadRequestError('Verification token has expired');
+    }
+
+    // Verify the user
+    await userRepository.verifyEmail(verification.userId);
+
+    // Delete the verification token
+    await emailVerificationRepository.deleteByToken(token);
+
+    // Create audit log
+    await prisma.auditLog.create({
+      data: {
+        userId: verification.userId,
+        action: 'EMAIL_VERIFIED',
+        resource: 'user',
+        resourceId: verification.userId,
+      },
+    });
+
+    logger.info({
+      userId: verification.userId,
+      message: 'Email verified successfully',
+    });
+  }
+
+  async resendVerificationEmail(email: string): Promise<void> {
+    const user = await userRepository.findByEmail(email.toLowerCase().trim());
+
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+
+    if (user.emailVerified) {
+      throw new BadRequestError('Email is already verified');
+    }
+
+    // Delete old verification tokens
+    await emailVerificationRepository.deleteAllUserTokens(user.id);
+
+    // Generate new token
+    const verificationToken = hashService.generateToken(64);
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+    await emailVerificationRepository.create(user.id, verificationToken, expiresAt);
+
+    // Send verification email
+    await emailService.sendVerificationEmail(user.email, verificationToken, user.username);
+
+    logger.info({
+      userId: user.id,
+      email: user.email,
+      message: 'Verification email resent',
+    });
   }
 }
 

@@ -2,9 +2,9 @@ import { z } from 'zod';
 import { FastifyRequest, FastifyReply } from 'fastify';
 
 export const asyncHandler = (
-  fn: (req: any, reply: any) => Promise<any>
+  fn: (req: FastifyRequest, reply: FastifyReply) => Promise<unknown>
 ) => {
-  return async (req: any, reply: any): Promise<any> => {
+  return async (req: FastifyRequest, reply: FastifyReply): Promise<unknown> => {
     try {
       return await fn(req, reply);
     } catch (error) {
@@ -31,7 +31,7 @@ export const validateRequest = (schema: {
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const errors = error.errors.map((err) => ({
+        const errors = error.issues.map((err: z.ZodIssue) => ({
           field: err.path.join('.'),
           message: err.message,
         }));
