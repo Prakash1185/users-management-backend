@@ -2,7 +2,7 @@ import { FastifyRequest, FastifyReply } from 'fastify';
 import authService from '../services/auth.service';
 import { successResponse } from '../utils/response';
 import { z } from 'zod';
-import { registerSchema } from '../validators/schemas';
+import { registerSchema, loginSchema } from '../validators/schemas';
 import logger from '../utils/logger';
 
 export class AuthController {
@@ -33,6 +33,70 @@ export class AuthController {
         message: 'A verification email has been sent to your email address.',
       })
     );
+  }
+
+  async login(
+    request: FastifyRequest<{ Body: z.infer<typeof loginSchema> }>,
+    reply: FastifyReply
+  ): Promise<void> {
+    const { identifier, password } = request.body;
+
+    const result = await authService.login({
+      identifier,
+      password,
+    });
+
+    // Create audit log
+    logger.info({
+      userId: result.user.id,
+      ip: request.ip,
+      userAgent: request.headers['user-agent'],
+      message: 'User login successful',
+    });
+
+    reply.send(
+      successResponse('Login successful', {
+        user: result.user,
+        tokens: result.tokens,
+      })
+    );
+  }
+
+  async refreshToken(
+    request: FastifyRequest<{ Body: { refreshToken: string } }>,
+    reply: FastifyReply
+  ): Promise<void> {
+    const { refreshToken } = request.body;
+
+    if (!refreshToken) {
+      reply.status(400).send({
+        success: false,
+        message: 'Refresh token is required',
+        statusCode: 400,
+      });
+      return;
+    }
+
+    const result = await authService.refreshAccessToken(refreshToken);
+
+    reply.send(
+      successResponse('Access token refreshed', {
+        accessToken: result.accessToken,
+      })
+    );
+  }
+
+  async logout(
+    request: FastifyRequest<{ Body: { refreshToken: string } }>,
+    reply: FastifyReply
+  ): Promise<void> {
+    const { refreshToken } = request.body;
+
+    if (refreshToken) {
+      await authService.logout(refreshToken);
+    }
+
+    reply.send(successResponse('Logged out successfully'));
   }
 
   async checkEmailAvailability(

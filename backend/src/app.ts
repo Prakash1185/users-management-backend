@@ -70,6 +70,9 @@ export const buildApp = async (): Promise<FastifyInstance> => {
         api: 'GET /api/v1',
         auth: {
           register: 'POST /api/v1/auth/register',
+          login: 'POST /api/v1/auth/login',
+          refresh: 'POST /api/v1/auth/refresh',
+          logout: 'POST /api/v1/auth/logout',
           checkEmail: 'GET /api/v1/auth/check-email',
           checkUsername: 'GET /api/v1/auth/check-username',
         },
