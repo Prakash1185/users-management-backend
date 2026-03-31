@@ -149,6 +149,24 @@ export const buildApp = async (): Promise<FastifyInstance> => {
     { prefix: '/api/v1/upload' }
   );
 
+  // Register 2FA routes
+  await app.register(
+    async (instance) => {
+      const twoFactorRoutes = await import('./routes/twoFactor.routes');
+      await twoFactorRoutes.default(instance);
+    },
+    { prefix: '/api/v1/2fa' }
+  );
+
+  // Register session routes
+  await app.register(
+    async (instance) => {
+      const sessionRoutes = await import('./routes/session.routes');
+      await sessionRoutes.default(instance);
+    },
+    { prefix: '/api/v1/sessions' }
+  );
+
   // Not found handler
   app.setNotFoundHandler(notFoundHandler);
 
