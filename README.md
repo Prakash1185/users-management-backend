@@ -6,7 +6,7 @@ A production-grade REST API for comprehensive user management built with TypeScr
   <img src="/web/public/hero.png" alt="User Management Backend Banner" width="100%" />
 </p>
 
-## ✨ Features
+## Features
 
 - **Authentication**: JWT-based with access/refresh tokens, email verification, password reset
 - **Two-Factor Authentication**: TOTP-based 2FA with QR codes and 10 backup codes
@@ -17,7 +17,7 @@ A production-grade REST API for comprehensive user management built with TypeScr
 - **Notifications**: In-app notification system
 - **GDPR Compliance**: Data export, soft delete with 30-day recovery
 
-## 🛠 Tech Stack
+## Tech Stack
 
 | Category | Technology |
 |----------|------------|
@@ -31,7 +31,7 @@ A production-grade REST API for comprehensive user management built with TypeScr
 | Validation | Zod |
 | Logging | Pino |
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -78,7 +78,7 @@ JWT_REFRESH_EXPIRY=7d
 
 ---
 
-## 📚 API Reference
+## API Reference
 
 Base URL: `http://localhost:5001/api/v1`
 
@@ -205,7 +205,7 @@ Base URL: `http://localhost:5001/api/v1`
 
 ---
 
-## 🔐 Permissions
+## Permissions
 
 | Permission | Description |
 |------------|-------------|
@@ -281,7 +281,7 @@ The project follows **Clean Architecture** principles:
 2. **Services** - Business logic and rules
 3. **Repositories** - Data access layer (Prisma)
 
-## 🔒 Security
+## Security
 
 - Passwords hashed with bcrypt (12 rounds)
 - JWT access tokens expire in 15 minutes
@@ -294,7 +294,7 @@ The project follows **Clean Architecture** principles:
 
 ---
 
-## 📂 Database Schema
+## Database Schema
 
 ```
 users              # Core user data
@@ -313,7 +313,7 @@ notifications      # User notifications
 
 ---
 
-## 🌐 Documentation Site
+## Documentation Site
 
 The `web/` folder contains a Next.js documentation site built with:
 - **Shadcn UI** components
@@ -329,10 +329,3 @@ npm run dev
 
 ---
 
-## 📝 License
-
-MIT
-
-## 👤 Author
-
-Built as a learning project demonstrating production-grade backend architecture and best practices.
